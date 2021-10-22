@@ -7,10 +7,14 @@
 var app = require('../app');
 var debug = require('debug')('securedlogin:server');
 var http = require('http');
+const mongoose = require("mongoose");
+const dotenv = require('dotenv');
 
 /**
  * Get port from environment and store in Express.
  */
+
+dotenv.config({path: './.env'});
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
@@ -32,6 +36,10 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
+
+// DB connection
+const DB = process.env.DATABASE;
+mongoose.connect(DB).then(()=>console.log(`DB connection successful`));
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -86,5 +94,19 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+  console.log(`Listening on ${bind}`)
   debug('Listening on ' + bind);
 }
+
+
+// Handling some of the unhandled rejections
+process.on('unhandledRejection',(err)=>{
+  console.log(`UNHANDLED REJECTION!!`);
+  console.log(err.name, err.message);
+})
+
+// Handling some of the uncaught exceptions
+process.on('uncaughtException',(err)=>{
+  console.log('UNCAUGHT EXCEPTION!!');
+  console.log(err.name, err.message);
+})
